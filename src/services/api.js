@@ -1,61 +1,56 @@
+// services/api.js
+import axios from 'axios';
+
 const API_URL = 'http://localhost:8080/api';
 
-const api = {
-  login: async (username, password) => {
-    const response = await fetch(`${API_URL}/users/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
+export const loginUser = async (username, password) => {
+  try {
+    const response = await axios.post(`${API_URL}/users/login`, {
+      username,
+      password,
     });
-    const data = await response.json();
-    if (response.ok) {
-      // Сохраняем ID пользователя и токен
-      localStorage.setItem('user_id', data.id);
-      localStorage.setItem('auth_token', data.token);
-      return data.token;
-    } else {
-      throw new Error(data.message || 'Invalid username or password');
-    }
-  },
-
-  register: async (userData) => {
-    const response = await fetch(`${API_URL}/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Registration failed');
-    }
-    return data;
-  },
-
-  getUser: async () => {
-    const userId = localStorage.getItem('user_id');
-    const token = localStorage.getItem('auth_token');
-    if (!userId || !token) {
-      throw new Error('User ID or token not found');
-    }
-
-    const response = await fetch(`${API_URL}/users/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    const data = await response.json();
-    if (response.ok) {
-      return data;
-    } else {
-      throw new Error(data.message || 'Failed to fetch user data');
-    }
-  },
-
-  // Добавьте другие методы API здесь
+    return response.data;
+  } catch (error) {
+    throw new Error('Invalid username or password');
+  }
 };
 
-export default api;
+export const getUserProfile = async (token) => {
+  try {
+    const response = await axios.get(`${API_URL}/user/details`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to fetch user profile');
+  }
+};
+
+export const updateUserProfile = async (token, userData) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/user/details`,
+      userData, // Убедитесь, что userData - это объект JSON
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json', // Убедитесь, что Content-Type установлен в application/json
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to update user profile');
+  }
+};
+
+export const registerUser = async (userData) => {
+  try {
+    const response = await axios.post(`${API_URL}/users`, userData);
+    return response.data;
+  } catch (error) {
+    throw new Error('Registration failed');
+  }
+};

@@ -1,100 +1,125 @@
+// components/Register.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { Link } from 'react-router-dom';
+import { registerUser } from '../services/api';
 
-function Register() {
-  const [userData, setUserData] = useState({
-    username: '',
-    password: '',
-    details: {
-      first_name: '',
-      second_name: '',
-      email: '',
-      phone_number: '',
-      position: 'Developer',
-    },
-  });
-  const [message, setMessage] = useState('');
-  const [jsonRequest, setJsonRequest] = useState('');
-  const navigate = useNavigate();
+const Register = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [secondName, setSecondName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [position, setPosition] = useState('');
+  const [error, setError] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name.startsWith('details.')) {
-      const detailName = name.split('.')[1];
-      setUserData({
-        ...userData,
-        details: {
-          ...userData.details,
-          [detailName]: value,
-        },
-      });
-    } else {
-      setUserData({ ...userData, [name]: value });
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      // Отображаем JSON-запрос перед отправкой
-      setJsonRequest(JSON.stringify(userData, null, 2));
-
-      await api.register(userData);
-      navigate('/login');
-    } catch (error) {
-      setMessage(error.message);
+      const userData = {
+        username,
+        password,
+        details: {
+          first_name: firstName,
+          second_name: secondName,
+          email,
+          phone_number: phoneNumber,
+          position,
+        },
+      };
+      const response = await registerUser(userData);
+      console.log(response);
+      // Здесь вы можете перенаправить пользователя на страницу входа или на другую страницу
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   return (
-    <div className="container">
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Username</label>
-          <input type="text" name="username" value={userData.username} onChange={handleChange} required />
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-header">
+              <h2 className="text-center">Register</h2>
+            </div>
+            <div className="card-body">
+              <form onSubmit={handleRegister}>
+                <div className="form-group">
+                  <label>Username:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Password:</label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>First Name:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Second Name:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={secondName}
+                    onChange={(e) => setSecondName(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email:</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Phone Number:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Position:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={position}
+                    onChange={(e) => setPosition(e.target.value)}
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary btn-block">Register</button>
+                {error && <p className="text-danger text-center mt-3">{error}</p>}
+              </form>
+              <div className="text-center mt-3">
+                <Link to="/login" className="btn btn-link">Go to Login</Link>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="form-group">
-          <label>Password</label>
-          <input type="password" name="password" value={userData.password} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label>First Name</label>
-          <input type="text" name="details.first_name" value={userData.details.first_name} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label>Second Name</label>
-          <input type="text" name="details.second_name" value={userData.details.second_name} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label>Email</label>
-          <input type="email" name="details.email" value={userData.details.email} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label>Phone Number</label>
-          <input type="text" name="details.phone_number" value={userData.details.phone_number} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label>Position</label>
-          <select name="details.position" value={userData.details.position} onChange={handleChange} required>
-            <option value="Developer">Developer</option>
-            <option value="Seller">Seller</option>
-            <option value="Buyer">Buyer</option>
-          </select>
-        </div>
-        <button type="submit" className="btn">Register</button>
-      </form>
-      {message && <div className="message error">{message}</div>}
-      <p>Already have an account? <a href="/login">Login</a></p>
-
-      {/* Отображение JSON-запроса */}
-      <div className="json-request">
-        <h3>JSON Request</h3>
-        <pre>{jsonRequest}</pre>
       </div>
     </div>
   );
-}
+};
 
 export default Register;

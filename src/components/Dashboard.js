@@ -1,24 +1,26 @@
-import React, { useContext } from 'react';
-import { UserContext } from '../App';
-import { Link } from 'react-router-dom';
+// components/Dashboard.js
+import React from 'react';
+import { Link } from'react-router-dom';
 
-function Dashboard({ onLogout }) {
-  const { user } = useContext(UserContext);
-
-  if (!user) {
-    return <div>Loading...</div>;
-  }
-
+const Dashboard = ({ onLogout }) => {
   return (
-    <div className="container">
-      <h2>Dashboard</h2>
-      <p>Welcome, {user.username}!</p>
-      <div className="button-container">
-        <button onClick={onLogout} className="btn logout-btn">Logout</button>
-        <Link to="/profile" className="btn profile-btn">View Profile</Link>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-header">
+              <h2 className="text-center">Dashboard</h2>
+            </div>
+            <div className="card-body">
+              <p>Welcome to your dashboard!</p>
+              <Link to="/profile" className="btn btn-primary mr-3">Go to Profile</Link>
+              <button className="btn btn-danger" onClick={onLogout}>Logout</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;
